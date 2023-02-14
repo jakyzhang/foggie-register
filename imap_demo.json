@@ -1,0 +1,5 @@
+{
+    "host":"imap.youmail.com",
+    "port":993,
+    "tls":true
+}

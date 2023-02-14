@@ -3,6 +3,7 @@ const imaps = require("imap-simple");
 const _ = require("lodash");
 const inquirer = require("inquirer");
 var fs = require("fs");
+var path = require("path");
 
 const mailFrom = "vfoggieadmin@vofocorp.com";
 const mailSubject = "Virtual Foggie System User Verification";
@@ -169,26 +170,21 @@ const KnownEmailImapConfig = {
 
 async function getLink(email, password) {
 
+  email = email.trim();
   const domain = email.split("@")[1];
-  
   let imapConfig = KnownEmailImapConfig[domain];
   if (!imapConfig) {
 
+    //read imap.config in current dir
     var imapConfigFile = path.join(process.cwd(), "imap.json");
     if (fs.existsSync(imapConfigFile)) {
-      console.log("[CONFIG] read imap config from " + imapConfigFile);
+      console.log("read local imap config file : " + imapConfigFile );
       imapConfig = JSON.parse(fs.readFileSync(imapConfigFile, "utf8"));
     } 
   }
 
   if (!imapConfig) { 
-    console.log("[CONFIG] no imap config found, use default config");
-    imapConfig = {
-      host: "imap." + domain,
-    }
-  }
-
-  if (!imapConfig) {
+    console.log("not found imap config for domain : " + domain + ", use default imap config");
     imapConfig = {
       host: "imap." + domain,
     }
@@ -200,7 +196,7 @@ async function getLink(email, password) {
       password: password,
       host: imapConfig.host,
       port: imapConfig.port || 993,
-      tls: imapConfig.tls || true,
+      tls: imapConfig.tls !== false ? true : false,
       authTimeout: 30000,
     },
   };
@@ -365,6 +361,7 @@ async function updateFoggieProfile(user, foggiePwd,walletInfo) {
 async function foggieRegister(email, emailPwd, promo_code, foggiePwd,wallet) {
   var sendOk = await sendLink(email, promo_code);
   if (!sendOk) {
+    console.log("[ERROR] send link failed");
     return false;
   }
 
@@ -418,10 +415,22 @@ async function foggieRegister(email, emailPwd, promo_code, foggiePwd,wallet) {
 
 
 async function foggieNFTCode(email, password) {
- 
-  const domain = email.split("@")[1].trim();
-  const imapConfig = KnownEmailImapConfig[domain];
+  
+  email = email.trim();
+  const domain = email.split("@")[1];
+  let imapConfig = KnownEmailImapConfig[domain];
   if (!imapConfig) {
+
+    //read imap.config in current dir
+    var imapConfigFile = path.join(process.cwd(), "imap.json");
+    if (fs.existsSync(imapConfigFile)) {
+      console.log("read local imap config file : " + imapConfigFile );
+      imapConfig = JSON.parse(fs.readFileSync(imapConfigFile, "utf8"));
+    } 
+  }
+
+  if (!imapConfig) { 
+    console.log("not found imap config for domain : " + domain + ", use default imap config");
     imapConfig = {
       host: "imap." + domain,
     }
@@ -433,11 +442,10 @@ async function foggieNFTCode(email, password) {
       password: password,
       host: imapConfig.host,
       port: imapConfig.port || 993,
-      tls: imapConfig.tls || true,
+      tls: imapConfig.tls !== false ? true : false,
       authTimeout: 30000,
     },
   };
-
   let nftCode = null;
   try {
     const connection = await imaps.connect(config);

@@ -171,6 +171,7 @@ const KnownEmailImapConfig = {
 
 async function getLink(email, password) {
 
+  email = email.trim();
   const domain = email.split("@")[1];
   let imapConfig = KnownEmailImapConfig[domain];
   if (!imapConfig) {
@@ -416,9 +417,21 @@ async function foggieRegister(email, emailPwd, promo_code, foggiePwd,wallet) {
 
 async function foggieNFTCode(email, password) {
  
-  const domain = email.split("@")[1].trim();
-  const imapConfig = KnownEmailImapConfig[domain];
+  email = email.trim();
+  const domain = email.split("@")[1];
+  let imapConfig = KnownEmailImapConfig[domain];
   if (!imapConfig) {
+
+    //read imap.config in current dir
+    var imapConfigFile = path.join(process.cwd(), "imap.json");
+    if (fs.existsSync(imapConfigFile)) {
+      console.log("[邮箱]读取本地IMAP配置文件: " + imapConfigFile );
+      imapConfig = JSON.parse(fs.readFileSync(imapConfigFile, "utf8"));
+    } 
+  }
+
+  if (!imapConfig) { 
+    console.log("[邮箱]未找到IMAP配置, 使用默认配置,可以在当前目录创建imap.json文件,配置host, port, tls参数");
     imapConfig = {
       host: "imap." + domain,
     }
@@ -430,7 +443,7 @@ async function foggieNFTCode(email, password) {
       password: password,
       host: imapConfig.host,
       port: imapConfig.port || 993,
-      tls: imapConfig.tls || true,
+      tls: imapConfig.tls !== false ? true : false,
       authTimeout: 30000,
     },
   };
@@ -628,7 +641,7 @@ async function main() {
         {
           type: "input",
           message:
-            "输入邮箱账号文件，每行一个邮箱，格式为：邮箱账号\t邮箱密码:",
+            "输入邮箱账号文件,格式为：邮箱账号\t邮箱密码:",
           name: "emailFile",
           default: "email.txt",
           required: true,
