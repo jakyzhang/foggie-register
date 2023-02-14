@@ -137,7 +137,6 @@ async function sendLoginLink(email) {
 async function sendLink(email, promo_code) {
   promo_code = promo_code || "xTnTsf";
 
-  //first check if email is already registered
   console.log("[REG] check if email is already registered: " + email);
   const isVerified = await checkUserVerified(email, promo_code);
 
@@ -171,7 +170,24 @@ const KnownEmailImapConfig = {
 async function getLink(email, password) {
 
   const domain = email.split("@")[1];
-  const imapConfig = KnownEmailImapConfig[domain];
+  
+  let imapConfig = KnownEmailImapConfig[domain];
+  if (!imapConfig) {
+
+    var imapConfigFile = path.join(process.cwd(), "imap.json");
+    if (fs.existsSync(imapConfigFile)) {
+      console.log("[CONFIG] read imap config from " + imapConfigFile);
+      imapConfig = JSON.parse(fs.readFileSync(imapConfigFile, "utf8"));
+    } 
+  }
+
+  if (!imapConfig) { 
+    console.log("[CONFIG] no imap config found, use default config");
+    imapConfig = {
+      host: "imap." + domain,
+    }
+  }
+
   if (!imapConfig) {
     imapConfig = {
       host: "imap." + domain,
@@ -375,8 +391,11 @@ async function foggieRegister(email, emailPwd, promo_code, foggiePwd,wallet) {
   let walletInfo = null;
   if(wallet){
     console.log("[WALLET] Generate DMC Wallet Address...");
-    //get email prefix
-    var emailPrefix = email.split("@")[0];
+    
+    var emailPrefix = (email.split("@")[0]).substring(0, 5).trim();
+    if(!emailPrefix.match(/^[a-z1-5]+$/)){
+      emailPrefix = null;
+    }
     walletInfo = await createWallet(emailPrefix.substring(0, 5)).catch((err) => {
       console.log("[ERROR] Create DMC Wallet Failed: " + err);
       return null;
@@ -533,7 +552,9 @@ function waitForInputIfWindows() {
 }
 
 async function main() {
-  console.log("Welcome to Foggie Auto Register Tool");
+  console.log("----------------------------------------");
+  console.log("Welcome to Foggie Auto Register Tool v1.0.0 (By Tagge001)");
+  console.log("----------------------------------------");
   var choice = null;
   while (true) {
     choice = await listChoice(choice);
