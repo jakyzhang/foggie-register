@@ -1,0 +1,18 @@
+{
+  "scripts": {
+    "start": "node index.js"
+  },
+  "name": "register",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/jakyzhang/foggie-register.git",
+  "author": "jakyzhang@live.com <jakyzhang@live.com>",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "0.27.2",
+    "eosjs-ecc": "^4.0.7",
+    "imap-simple": "^5.1.0",
+    "inquirer": "^8.0.0",
+    "lodash": "^4.17.21"
+  }
+}
