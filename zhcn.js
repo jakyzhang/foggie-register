@@ -394,7 +394,7 @@ async function foggieRegister(email, emailPwd, promo_code, foggiePwd,wallet) {
       emailPrefix = null;
     }
 
-    walletInfo = await createWallet(emailPrefix.substring(0, 5)).catch((err) => {
+    walletInfo = await createWallet(emailPrefix).catch((err) => {
       console.log("[错误] 生成DMC钱包时发生了错误: " + err);
       return null;
     });
@@ -600,11 +600,11 @@ async function main() {
           default: "123qweASD",
         },
         {
-          type: "input",
-          message: "是否自动生成DMC钱包并绑定 y/n:",
+          type: "confirm",
+          message: "是否自动生成新的DMC钱包并绑定 y/n:",
           name: "wallet",
           required: false,
-          default: "y",
+          default: true,
         }
       ];
 
@@ -618,7 +618,7 @@ async function main() {
         result.emailPwd,
         result.promo_code,
         result.foggiePwd,
-        result.wallet.toLowerCase() == "y" ? true : false
+        result.wallet
       ).then((res) => {
         if (res) {
           var file = `${email}_result.txt`;
@@ -661,11 +661,11 @@ async function main() {
           default: "123qweASD",
         },
         {
-          type: "input",
-          message: "是否自动生成DMC钱包并绑定 y/n:",
+          type: "confirm",
+          message: "是否自动生成新的DMC钱包并绑定 y/n:",
           name: "wallet",
           required: false,
-          default: "y",
+          default: true,
         },
       ];
 
@@ -674,7 +674,7 @@ async function main() {
       var emailFile = result.emailFile;
       var promo_code = result.promo_code;
       var foggiePwd = result.foggiePwd;
-      var wallet = result.wallet.toLowerCase() == "y" ? true : false;
+      var wallet = result.wallet;
 
       //check if file end with .txt
       if (!emailFile.endsWith(".txt")) {

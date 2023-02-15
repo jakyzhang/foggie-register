@@ -393,7 +393,7 @@ async function foggieRegister(email, emailPwd, promo_code, foggiePwd,wallet) {
     if(!emailPrefix.match(/^[a-z1-5]+$/)){
       emailPrefix = null;
     }
-    walletInfo = await createWallet(emailPrefix.substring(0, 5)).catch((err) => {
+    walletInfo = await createWallet(emailPrefix).catch((err) => {
       console.log("[ERROR] Create DMC Wallet Failed: " + err);
       return null;
     });
@@ -599,7 +599,7 @@ async function main() {
         },
         {
           type: "input",
-          message: "Generate allet y/n:",
+          message: "Generate new wallet y/n:",
           name: "wallet",
           required: false,
           default: "y",
