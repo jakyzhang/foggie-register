@@ -173,6 +173,7 @@ async function getLink(email, password) {
   email = email.trim();
   const domain = email.split("@")[1];
   let imapConfig = KnownEmailImapConfig[domain];
+  console.log("imap config for domain : " + domain, imapConfig);
   if (!imapConfig) {
 
     //read imap.config in current dir
@@ -197,17 +198,15 @@ async function getLink(email, password) {
       host: imapConfig.host,
       port: imapConfig.port || 993,
       tls: imapConfig.tls !== false ? true : false,
-      authTimeout: 30000,
+      authTimeout: 6000,
     },
   };
 
   try {
     const connection = await imaps.connect(config);
-
     await connection.openBox("INBOX");
     const searchCriteria = [
-      "UNSEEN",
-      ["SINCE", new Date(Date.now() - 5 * 60 * 1000)],
+      "UNSEEN"
     ];
     const fetchOptions = {
       bodies: ["HEADER", "TEXT"],
@@ -222,7 +221,6 @@ async function getLink(email, password) {
       const from = headers.body.from[0];
 
       console.log("subject: " + subject);
-
       if (subject != mailSubject || from != mailFrom) {
         continue;
       }
@@ -829,4 +827,4 @@ main()
   .catch((error) => {
     console.log(error);
     waitForInputIfWindows();
-  });
+});

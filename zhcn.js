@@ -206,8 +206,7 @@ async function getLink(email, password) {
     const connection = await imaps.connect(config);
     await connection.openBox("INBOX");
     const searchCriteria = [
-      "UNSEEN",
-      ["SINCE", new Date(Date.now() - 5 * 60 * 1000)],
+      "UNSEEN"
     ];
     const fetchOptions = {
       bodies: ["HEADER", "TEXT"],
@@ -563,7 +562,7 @@ function waitForInputIfWindows() {
 
 async function main() {
   console.log("----------------------------------------");
-  console.log("Foggie账号全自动注册 v0.1 By Tagge001");
+  console.log("Foggie账号全自动注册 v0.3.407 By Tagge001");
   console.log("----------------------------------------");
   var choice = null;
   while (true) {
