@@ -8,3 +8,5 @@ jobs/*
 
 cache
 cache/*
+
+bin/*

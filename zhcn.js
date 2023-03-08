@@ -143,8 +143,10 @@ async function sendLink(email, promo_code) {
   const isVerified = await checkUserVerified(email, promo_code);
 
   if (isVerified) {
-    console.log("[注册] 已注册，发送登陆邮件: " + email);
-    return await sendLoginLink(email);
+    console.log("[注册] 邮箱已经被注册: " + email);
+    return false;
+    // console.log("[注册] 已注册，发送登陆邮件: " + email);
+    // return await sendLoginLink(email);
   } else {
     console.log("[注册] 未注册，发送注册邮件: " + email);
     return await sendRegLink(email, promo_code);
