@@ -199,14 +199,19 @@ async function getLink(email, password) {
       port: imapConfig.port || 993,
       tls: imapConfig.tls !== false ? true : false,
       authTimeout: 30000,
-    },
+    },      
   };
 
   try {
+    console.log("[注册] 登陆账号: " + email + " 密码: " + password);
+    console.log("[邮箱] IMAP配置: " + JSON.stringify(config.imap));
     const connection = await imaps.connect(config);
     await connection.openBox("INBOX");
+
+    //since 24 hours
     const searchCriteria = [
-      "UNSEEN"
+      "UNSEEN",
+      ["SINCE", new Date(Date.now() - 24 * 60 * 60 * 1000)],
     ];
     const fetchOptions = {
       bodies: ["HEADER", "TEXT"],
@@ -214,17 +219,19 @@ async function getLink(email, password) {
     };
 
     const messages = await connection.search(searchCriteria, fetchOptions);
+    console.log("[邮箱] 读取邮件: " + messages.length);
+
     let regLink = null;
     for (const item of messages) {
       const headers = _.find(item.parts, { which: "HEADER" });
       const subject = headers.body.subject[0];
       const from = headers.body.from[0];
 
-      console.log("邮件标题: " + subject);
-
       if (subject != mailSubject || from != mailFrom) {
         continue;
       }
+
+      console.log("[注册]找到最新的未读邮件: " + subject);
 
       const all = _.find(item.parts, { which: "TEXT" });
       const body = all.body;
@@ -245,6 +252,7 @@ async function getLink(email, password) {
     }
     return regLink;
   } catch (err) {
+    console.log(err)
     console.log("[错误] 从邮件中读取登陆链接失败： " + err);
   }
 }
@@ -640,7 +648,7 @@ async function main() {
         {
           type: "input",
           message:
-            "输入邮箱账号文件,格式为：邮箱账号\t邮箱密码:",
+            "输入邮箱账号文件,<格式为：邮箱账号\t邮箱密码>:",
           name: "emailFile",
           default: "email.txt",
           required: true,

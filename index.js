@@ -5,7 +5,7 @@ const inquirer = require("inquirer");
 var fs = require("fs");
 var path = require("path");
 
-const mailFrom = "vfoggieadmin@vofocorp.com";
+const mailFrom = "vofocorp.com";
 const mailSubject = "Virtual Foggie System User Verification";
 
 const UserAgent ="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome//110.0.0.0 Safari/537.36";
@@ -220,8 +220,8 @@ async function getLink(email, password) {
       const subject = headers.body.subject[0];
       const from = headers.body.from[0];
 
-      console.log("subject: " + subject);
-      if (subject != mailSubject || from != mailFrom) {
+      console.log("subject: " + subject + ", from: " + from);
+      if(subject.indexOf(mailSubject) == -1 || from.indexOf(mailFrom) == -1) {
         continue;
       }
 
@@ -459,14 +459,14 @@ async function foggieNFTCode(email, password) {
 
     const messages = await connection.search(searchCriteria, fetchOptions);
     var nftSubject = "Virtual Foggie System NFT KEY"
-    var nftFrom = "vfoggieadmin@vofocorp.com"
+    var nftFrom = "@vofocorp.com"
 
     for (const item of messages) {
       const headers = _.find(item.parts, { which: "HEADER" });      
       const from = headers.body.from[0];
       const subject = headers.body.subject[0];
       
-      if (from != nftFrom || subject != nftSubject) {
+      if (from.indexOf(nftFrom) == -1 || subject.indexOf(nftSubject) == -1) {
           continue;
       }
       
